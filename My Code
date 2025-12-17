@@ -1,0 +1,121 @@
+import pygame
+import random
+import operator
+import sys
+
+def generate_math_problem():
+
+    ops = {
+        '+': operator.add,
+        '-': operator.sub,
+        '*': operator.mul,
+        '/': operator.truediv,
+    }
+
+    num1 = random.randint(1, 100)
+    num2 = random.randint(1, 100)
+
+    op_symbol = random.choice(["+", "-", "*", "/",])
+
+    if op_symbol == "/":
+        num1 = random.randint(1, 12)
+        num1 = num2 * random.randint(1, 12)
+
+    answer = ops.get(op_symbol)(num1, num2)
+    question = f"What is {num1} {op_symbol} {num2}?"
+    return question, answer
+
+#----doing the fuckass window now
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("math Practice")
+clock = pygame.time.Clock()
+
+font = pygame.font.Font(None, 52)
+small_font = pygame.font.Font(None, 36)
+
+#shity state of this thingy
+question, answer = generate_math_problem()
+user_input = ""
+feedback = ""
+tries = 0
+
+running = True
+while running:
+    clock.tick(60)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                user_input = user_input[:-1]
+
+            elif event.key == pygame.K_RETURN:
+                try:
+                    user_answer = float(user_input)
+
+                    if user_answer == answer:
+                        feedback = "correct"
+                        tries = 0
+                        question, answer = generate_math_problem()
+                    else:
+
+                        if tries == 0:
+                            feedback = "incorrect try again"
+                            tries = 1
+                        else:
+                            feedback = f"Incorrect correct answer was: {answer}"
+                            tries =0
+                            question,answer = generate_math_problem()
+
+                except ValueError:
+                    feedback = "please type a number"
+
+                user_input = ""
+
+            else:
+                if event.unicode.isdigit() or event.unicode in ".-":
+                    if event.unicode == "." and "." in user_input:
+                        pass
+                    elif event.unicode == "-" and user_input != "":
+                        pass
+                    else:
+                        user_input += event.unicode
+#drawing the bitch
+    screen.fill((255, 255, 255))
+
+    q_surf = font.render(question, True, (0, 0, 0))
+    screen.blit(q_surf, (50, 120))
+
+    a_surf = font.render("Your answer: " + user_input, True, (0, 0, 0))
+    screen.blit(a_surf, (50, 220))
+
+    fb_surf = small_font.render(feedback, True, (0, 0, 0))
+    screen.blit(fb_surf, (50, 300))
+
+
+    pygame.display.update()
+
+pygame.quit()
+sys.exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
